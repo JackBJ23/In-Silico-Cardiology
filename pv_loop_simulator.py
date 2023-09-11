@@ -7,8 +7,10 @@ Original file is located at
     https://colab.research.google.com/drive/1KOaBDODvxiSPfM7I_TdHiQdS6BTyJHlP
 """
 
-## Given a set of circuit parameter, the function pvloop_simulator plots the pressure-volume (PV) loops of cardiac cycles, 
-## the pressure (aortic, etc.), and blood flow, and returns information about the system
+'''
+Given a set of circuit parameters, the function pvloop_simulator plots the pressure-volume (PV) loops of cardiac cycles, 
+the pressure (aortic, etc.), and blood flow, and returns information about the system (e.g. ejection fraction)
+'''
 
 import numpy as np
 import torch
@@ -49,8 +51,7 @@ def Elastance(Emax,Emin,t, Tc):
     tn = t/(0.2+0.15*Tc)
     return (Emax-Emin)*1.55*(tn/0.7)**1.9/((tn/0.7)**1.9+1)*1/((tn/1.17)**21.9+1) + Emin
 
-def pvloop_simulator(Tc, start_v, Emax, Emin, Rm, Ra, Vd, N, plotloops, plotpressures, plotflow):
-    global startp, Rs, Rc, Ca, Cs, Cr, Ls
+def pvloop_simulator(Tc, start_v, startp, Rs, Rc, Ca, Cs, Cr, Ls, Emax, Emin, Rm, Ra, Vd, N, plotloops, plotpressures, plotflow):
 
     start_pla = float(start_v*Elastance(Emax, Emin, 0, Tc))
     start_pao = startp
@@ -108,6 +109,8 @@ def pvloop_simulator(Tc, start_v, Emax, Emin, Rm, Ra, Vd, N, plotloops, plotpres
 ## example of use:
 
 #select circuit values:
+Tc = 1.
+start_v = 150.
 startp = 75.
 Rs = 1.0
 Rc = 0.0398
@@ -115,5 +118,13 @@ Ca = 0.08
 Cs = 1.33
 Cr = 4.400
 Ls = 0.0005
+Emax = 1.7
+Emin = 0.05
+Rm = 0.005
+Ra = 0.002
+Vd = 1.
 
-pvloop_simulator(1., 150., 1.7, 0.05, 0.005, 0.002, 10., 70, True, True, True)
+# N: number of cycles simulated before plotting pvloops and getting information
+N = 70
+
+pvloop_simulator(Tc, start_v, startp, Rs, Rc, Ca, Cs, Cr, Ls, Emax, Emin, Rm, Ra, Vd, N, True, True, True)
